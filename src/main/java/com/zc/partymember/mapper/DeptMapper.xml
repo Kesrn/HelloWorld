@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zc.partymember.mapper.DeptMapper" >
+    <sql id="Base_Column_List" >
+    id, name, code, create_by,update_by,create_date,update_date,remark,fid
+  </sql>
+    <select id="selectDeptsByFid" resultType="com.zc.partymember.domain.Dept">
+        select
+        <include refid="Base_Column_List" />
+        from p_dept
+        where fid = #{fid,jdbcType=INTEGER}
+    </select>
+    <select id="selectDeptById" resultType="com.zc.partymember.domain.Dept">
+        select
+        <include refid="Base_Column_List" />
+        from p_dept
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+</mapper>

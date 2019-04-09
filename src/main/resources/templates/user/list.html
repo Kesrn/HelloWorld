@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="utf-8">
+    <title>用户管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    <button class="layui-btn layui-btn-sm" id="btnCreate">新增用户</button>
+                </div>
+                <div class="layui-card-body">
+                    <table class="layui-hide" id="test" lay-filter="test"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script th:src="@{/layuiadmin/lib/jquery.js}"></script><!--min.-->
+<script th:src="@{/layuiadmin/layui/layui.js}"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        var tableIns = table.render({
+            elem: '#test'
+            ,url:'user/userlist'
+            ,title: '用户数据表'
+            ,cellMinWidth: 80
+            ,cols: [
+                [
+                {field:'xuhao', title: '序号', width: 100,type:'numbers'}
+                ,{field: 'username', title: '用户名'}
+                ,{field: 'sex', title: '性别', width:80}
+                ,{field: 'position', title: '职务'}
+                ,{field: 'deptname', title: '所属区县'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo'}
+                ]
+            ]
+            ,id: 'testReload'
+            ,page: true
+            ,height: 471
+        });
+        $('#btnCreate').click(function () {
+            window.location.href = "/user/create";
+
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的要删除吗？', function(index){
+                    obj.del();
+                    $.ajax({
+                        url:'/user/'+obj.data.id+'/delete',
+                        type:'post',
+                        async:false,
+                        data: {id:obj.data.id},
+                        success:function(data){
+
+                            tableIns.reload({
+
+                               page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                window.location.href = "/user/"+obj.data.id+"/update";
+            }
+        });
+    });
+
+</script>
+
+</body>
+</html>

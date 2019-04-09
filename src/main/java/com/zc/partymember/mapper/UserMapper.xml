@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zc.partymember.mapper.UserMapper" >
+    <sql id="userColumns">
+        a.id AS "id",
+        a.username AS "username",
+        a.password AS "password",
+        a.status AS "status",
+        a.salt AS "salt",
+        a.role AS "role",
+        a.sex AS "sex",
+        a.position AS "position",
+        a.remark AS "remark",
+        b.id AS "deptId",
+        b.name AS "deptname"
+    </sql>
+  <sql id="userJoins">
+    LEFT JOIN p_dept b ON a.dept_id = b.id
+  </sql>
+  <insert id="insert" parameterType="com.zc.partymember.domain.User" >
+    insert into p_user (id, username, password, 
+      status, salt, sex, 
+      role, position, create_date, 
+      create_by, update_date, update_by, 
+      remark, dept_id)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, 
+      #{role,jdbcType=VARCHAR}, #{position,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{createBy,jdbcType=INTEGER}, #{updateDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER},
+      #{remark,jdbcType=VARCHAR}, #{deptId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zc.partymember.domain.User" >
+    insert into p_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="salt != null" >
+        salt,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="role != null" >
+        role,
+      </if>
+      <if test="position != null" >
+        position,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="deptId != null" >
+        dept_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="salt != null" >
+        #{salt,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="role != null" >
+        #{role,jdbcType=VARCHAR},
+      </if>
+      <if test="position != null" >
+        #{position,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null" >
+        #{deptId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="selectByUsername" resultType="com.zc.partymember.domain.User" parameterType="java.lang.String" >
+    select
+    <include refid="userColumns" />
+    from p_user a
+    <include refid="userJoins"/>
+    where a.username = #{username,jdbcType=VARCHAR} AND a.status = '0'
+  </select>
+  <select id="selectAll" resultType="com.zc.partymember.domain.User" >
+        select
+        <include refid="userColumns" />
+        from p_user a
+        <include refid="userJoins"/>
+        WHERE a.status = '0'
+  </select>
+    <select id="selectByPrimaryKey" resultType="com.zc.partymember.domain.User">
+        select
+        <include refid="userColumns" />
+        from p_user a
+        <include refid="userJoins"/>
+        WHERE a.status = '0' AND a.id = #{id}
+    </select>
+    <update id="updateByPrimaryKey" parameterType="com.zc.partymember.domain.User">
+        update p_user
+        set
+          username = #{username,jdbcType=VARCHAR},
+          position = #{position,jdbcType=VARCHAR},
+          sex = #{sex,jdbcType=VARCHAR},
+          role = #{role,jdbcType=VARCHAR},
+          update_by = #{updateBy,jdbcType=INTEGER},
+          update_date = #{updateDate,jdbcType=TIMESTAMP},
+          remark = #{remark,jdbcType=VARCHAR},
+          dept_id = #{deptId,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="deleteByPrimaryKey" parameterType="int">
+        UPDATE p_user
+        SET
+          status = '1'
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updatePasswordByPrimaryKey" parameterType="com.zc.partymember.domain.User">
+        update p_user
+        set
+        password = #{password,jdbcType=VARCHAR},
+        salt = #{salt,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<div th:replace="top :: header"></div>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    搜索关键词:
+                    <div class="layui-inline">
+                        <input class="layui-input" style="height: 32px;" name="name" id="name" autocomplete="off" placeholder="请输入关键词">
+                    </div>
+
+                    <div class="layui-inline"  th:if="${user.role=='Municipal'}">
+                        县（市、区）：
+                        <div class="layui-inline" >
+                            <select class="layui-input" style="height: 32px; width: 100px;" name="area" id="area" autocomplete="off">
+                                <option value="">全部</option>
+                                <option value="2">广阳区</option>
+                                <option value="3">安次区</option>
+                                <option value="4">开发区</option>
+                                <option value="5">三河市</option>
+                                <option value="6">香河县</option>
+                                <option value="7">大厂县</option>
+                                <option value="8">固安县</option>
+                                <option value="9">永清县</option>
+                                <option value="10">霸州市</option>
+                                <option value="11">文安县</option>
+                                <option value="12">大城县</option>
+                            </select>
+                        </div>
+                    </div>
+                    审核状态：
+                    <div class="layui-inline">
+                        <select class="layui-input" style="height: 32px; width: 100px;" name="status" id="status" autocomplete="off">
+                            <option value="">全部</option>
+                            <option value="0">未审核</option>
+                            <option value="1">审核未通过</option>
+                            <option value="2">审核已通过</option>
+                        </select>
+                    </div>
+                    支部召开会议时间：
+                    <div class="layui-inline">
+                            <input class="layui-input" style="height: 32px; width: 100px;" name="start" lay-verify="required" id="start" placeholder="开始日期" autocomplete="off" readonly="readonly">
+                    </div>
+                    -
+                    <div class="layui-inline">
+                            <input  class="layui-input" style="height: 32px; width: 100px;" name="end" lay-verify="required" id="end" placeholder="结束日期" autocomplete="off" readonly="readonly" >
+                    </div>
+                    <button class="layui-btn layui-btn-sm" data-type="reload">搜索</button>
+                    <!--<button type="reset" class="layui-btn layui-btn-sm" id="reset">重置</button>-->
+                    <button class="layui-btn layui-btn-sm" id="btnCreate">新增党员</button>
+                </div>
+                <div class="layui-card-body">
+
+                    <table class="layui-hide" id="user-table" lay-filter="user-table-filter"></table>
+
+                    <script type="text/html" id="user-sex">
+                        {{#  if(d.sex == '0'){ }}
+                        男
+                        {{#  } }}
+                        {{#  if(d.sex == '1'){ }}
+                        女
+                        {{#  } }}
+                    </script>
+                    <script type="text/html" id="user-area">
+                        {{#  if(d.area == '2'){ }}
+                        广阳区
+                        {{#  } }}
+                        {{#  if(d.area == '3'){ }}
+                        安次区
+                        {{#  } }}
+                        {{#  if(d.area == '4'){ }}
+                        开发区
+                        {{#  } }}
+                        {{#  if(d.area == '5'){ }}
+                        三河市
+                        {{#  } }}
+                        {{#  if(d.area == '6'){ }}
+                        香河县
+                        {{#  } }}
+                        {{#  if(d.area == '7'){ }}
+                        大厂县
+                        {{#  } }}
+                        {{#  if(d.area == '8'){ }}
+                        固安县
+                        {{#  } }}
+                        {{#  if(d.area == '9'){ }}
+                        永清县
+                        {{#  } }}
+                        {{#  if(d.area == '10'){ }}
+                        霸州市
+                        {{#  } }}
+                        {{#  if(d.area == '11'){ }}
+                        文安县
+                        {{#  } }}
+                        {{#  if(d.area == '12'){ }}
+                        大城县
+                        {{#  } }}
+                    </script>
+                    <script type="text/html" id="user-status">
+                        {{#  if(d.status == '0'){ }}
+                        未审核
+                        {{#  } }}
+                        {{#  if(d.status == '1'){ }}
+                        审核未通过
+                        {{#  } }}
+                        {{#  if(d.status == '2'){ }}
+                        审核已通过
+                        {{#  } }}
+                    </script>
+                    <script type="text/html" id="user-table-operate">
+                        <a class="layui-btn layui-btn-xs" lay-event="audit">审核</a>
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/layuiadmin/layui/layui.js}"></script>
+
+<script>
+    layui.use('table', function(){
+        var table = layui.table
+            ,admin = layui.admin
+            ,$ = layui.$;
+         //日期范围
+        layui.use(['form', 'layedit', 'laydate',"jquery"], function(){
+            var form = layui.form
+                ,layer = layui.layer
+                ,$ = layui.jquery
+                ,laydate = layui.laydate;
+            var nowTime = new Date().valueOf();
+
+            //日期
+            var start = laydate.render({ //投票开始
+                elem: '#start',
+                done:function(value,date){
+                    endMax = end.config.max;
+                    end.config.min = date;
+                    end.config.min.month = date.month -1;
+                }
+            });
+            var end = laydate.render({ //投票结束
+                elem: '#end',
+                done:function(value,date){
+                    if($.trim(value) == ''){
+                        var curDate = new Date();
+                        date = {'date': curDate.getDate(), 'month': curDate.getMonth()+1, 'year': curDate.getFullYear()};
+                    }
+                    start.config.max = date;
+                    start.config.max.month = date.month -1;
+                }
+            });
+        });
+        $('#btnCreate').click(function () {
+            window.location.href = "/member/create";
+        });
+        var colsArr = [
+            {field:'xuhao', title: '序号', width: 100,type:'numbers'}
+            ,{field:'name', title: '姓名', width: 100}
+            ,{field:'sex', title: '性别', width: 100, toolbar: '#user-sex'}
+            ,{field:'age', title: '年龄', width: 100}
+            ,{field:'education', title: '学历', width: 100}
+            ,{field:'volunteerNumber', title: '志愿者编号', width: 150}
+            ,{field:'areaName', title: '所在区县', width: 150}
+            ,{field:'townName', title: '所在乡镇', width: 150}
+            ,{field:'villageName', title: '所在街道', width: 150}
+            ,{field:'meetingTime', title: '支部召开会议时间', width: 150}
+            ,{field:'approvalTime', title: '党委审批时间', width: 150}
+            ,{field:'talker', title: '谈话人', width: 100}
+            ,{field:'status', title: '审核状态', width: 100,toolbar: '#user-status'}
+            ,{field: 'operation', width: 150, fixed: 'right', title: '操作', toolbar: '#user-table-operate'}
+        ];
+        table.render({
+            elem: '#user-table'
+            ,url: '/member/memberList'
+            ,height: 488
+            ,width: '100%'
+            ,cols: [colsArr]
+            ,page: true
+            ,id: 'user-table-reload'
+        });
+
+        //监听工具条
+        table.on('tool(user-table-filter)', function(obj){
+            var data = obj.data;
+            var layEvent = obj.event;
+            // 删除
+            if (layEvent === 'delete') {
+                layer.confirm('确定删除该数据吗？', {
+                    btn: ['确定', '再看看']
+                    , icon: 3
+                }, function (index, layero) {
+                    $.ajax({
+                        url: '/member/'+data.id+'/delete'
+                        , type: 'delete'
+                        , success: function (result) {
+                            layer.alert(result.msg, {icon: 1});
+                            table.reload('user-table-reload', {
+                                page: {
+                                    curr: 1 //重新从第 1 页开始
+                                }
+                            });
+                        }
+                        , error: function (msg) {
+                            layer.alert(msg, {icon: 2})
+                        }
+                    });
+                });
+            }
+            if (layEvent === 'edit') {
+                window.location.href = "/member/"+data.id+"/update";
+            }
+            if (layEvent === 'audit') {
+                window.location.href = "/member/"+data.id+"/audit";
+            }
+        });
+
+        var active = {
+            reload: function(){
+                var name = $('#name').val();
+                var status = $('#status option:selected').val();
+                var area = $('#area option:selected').val();
+                var start = $('#start').val();
+                var end = $('#end').val();
+                // console.log(name)
+                // console.log(status)
+                // console.log(area)
+                // console.log(start)
+                // console.log(end)
+
+                //执行重载
+                table.reload('user-table-reload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        name: name,
+                        status:status,
+                        area:area,
+                        start:start,
+                        end:end
+                    }
+                });
+            }
+        };
+
+        $('.layui-fluid .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>
+</body>
+</html>

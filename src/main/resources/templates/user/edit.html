@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="utf-8">
+    <title>编辑用户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layuiadmin/layui/css/layui.css}" media="all">
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+    <legend>编辑用户</legend>
+</fieldset>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <form class="layui-form">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="username"  id="username" lay-verify="title" autocomplete="off" placeholder="请输入用户名" class="layui-input" th:value="${user.username}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">职务</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="position" id="position"  lay-verify="position" autocomplete="off" placeholder="请输入职务" class="layui-input" th:value="${user.position}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性别</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="sex" value="0" title="男" th:checked="${user.sex eq '0'}">
+                            <input type="radio" name="sex" value="1" title="女" th:checked="${user.sex eq '1'}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">权限</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="role" value="Municipal" title="市级用户" lay-filter="level" th:checked="${user.role eq 'Municipal'}">
+                            <input type="radio" name="role" value="County" title="区县用户" lay-filter="level" th:checked="${user.role eq 'County'}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item" id="area" th:style="'display:' + @{(${user.role eq 'Municipal'} ? 'none' : 'block')}">
+                        <label class="layui-form-label">所属县（市、区）</label>
+                        <div class="layui-input-inline">
+                            <select name="area">
+                                <option value=""></option>
+                                <option th:value="${dept.id}" th:each="dept : ${depts}" th:text="${dept.name}" th:selected="${user.deptId eq dept.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-inline">
+                            <textarea id="remark" placeholder="请输入内容" class="layui-textarea" name="remark" th:text="${user.remark}"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn layui-btn-sm" id="btnCre">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/layuiadmin/lib/jquery.js}"></script>
+<script th:src="@{/layuiadmin/layui/layui.js}"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate
+            ,$ = layui.$;
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        var userid = '[[${user.id}]]';
+
+        $('#btnCre').click(function () {
+            var username = $('#username').val();
+            var position =$('#position').val();
+            var sex =$("input[name='sex']:checked").val();
+            var role=$("input[name='role']:checked").val();
+            var deptId=$("select[name='area']").val();
+            var remark=$('#remark').val();
+            var data = {
+                username : username,
+                deptId :deptId,
+                position:position,
+                sex: sex,
+                role:role,
+                remark:remark
+            };
+            $.ajax({
+                url:'/user/'+ userid +'/update',
+                type:'post',
+                async:false,
+                data: data,
+                success:function(result){
+                    if(result.code == 0){
+                        layer.alert(result.msg, {icon: 1});
+                        window.location.href = "/user";
+                    }else{
+                        layer.alert(result.msg, {icon: 2});
+                    }
+                }
+            });
+        });
+
+        form.on('radio(level)', function(data){
+            if(data.value == "Municipal"){
+                $("#area").hide();
+            }else{
+                $("#area").show();
+            }
+        });
+    });
+
+</script>
+
+</body>
+</html>
