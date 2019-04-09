@@ -26,9 +26,4 @@ public interface ApiConst {
     String API_DEPT_UPDATE = "/{id}/update";
     String API_DEPT_DELETE = "/{id}/delete";
 
-    String API_MEMBER = "/member";
-    String API_MEMBER_CREATE = "/create";
-    String API_MEMBER_LIST = "/memberList";
-    String API_MEMBER_UPDATE = "/{id}/update";
-    String API_MEMBER_DELETE = "/{id}/delete";
 }
